@@ -11,7 +11,6 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
-#Page setup
 st.set_page_config(
     page_title="PitchPerfectAI – Smart Cover Letter Generator",
     page_icon="✉️",
@@ -56,6 +55,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Title
 st.markdown("<h1 class='title'>✉️ PitchPerfectAI – AI Cover Letter Generator</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -70,12 +70,14 @@ with st.form("cover_letter_form"):
     job_description = st.text_area("Paste the Job Description", placeholder="Copy the full job posting here...")
     submitted = st.form_submit_button("Generate Cover Letter")
 
-# PDF generation utilities
+import unicodedata
 def generate_pdf(text):
+    # Normalize and remove unsupported characters
+    cleaned_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii')
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for line in text.split('\n'):
+    for line in cleaned_text.split('\n'):
         pdf.multi_cell(0, 10, line)
     return pdf.output(dest='S').encode('latin-1')
 
