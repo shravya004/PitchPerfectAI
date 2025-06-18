@@ -3,15 +3,15 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from fpdf import FPDF
+import base64
 
 # Load environment variables
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-# Initialize the Gemini model
 model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
-# Page setup
+#Page setup
 st.set_page_config(
     page_title="PitchPerfectAI – Smart Cover Letter Generator",
     page_icon="✉️",
@@ -34,12 +34,10 @@ st.markdown("""
             color: #000 !important;
             border: 0.5px solid #ccc !important;
             border-radius: 6px !important;
-            
         }
         input::placeholder, textarea::placeholder {
             background-color: #f9f9f9 !important;
             color: #000 !important;
-
         }
         .stButton>button {
             background-color: #4B8BBE;
@@ -55,8 +53,6 @@ st.markdown("""
             color: #666;
             margin-top: 30px;
         }
-        
-        
     </style>
 """, unsafe_allow_html=True)
 
@@ -73,6 +69,21 @@ with st.form("cover_letter_form"):
     tone = st.selectbox("Tone of the Letter", ["Professional", "Persuasive", "Formal", "Friendly"])
     job_description = st.text_area("Paste the Job Description", placeholder="Copy the full job posting here...")
     submitted = st.form_submit_button("Generate Cover Letter")
+
+# PDF generation utilities
+def generate_pdf(text):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    for line in text.split('\n'):
+        pdf.multi_cell(0, 10, line)
+    return pdf.output(dest='S').encode('latin-1')
+
+def download_pdf_button(text):
+    pdf_data = generate_pdf(text)
+    b64 = base64.b64encode(pdf_data).decode()
+    href = f'<a href="data:application/pdf;base64,{b64}" download="cover_letter.pdf">📥 Download as PDF</a>'
+    st.markdown(href, unsafe_allow_html=True)
 
 # Submission handling
 if submitted:
@@ -115,27 +126,30 @@ if submitted:
         st.success("✅ Cover letter generated successfully!")
         st.text_area("📄 Generated Cover Letter", value=cover_letter, height=400)
 
-    # ATS Match Scoring
-    if job_description:
-        with st.spinner("🔍 Analyzing ATS match..."):
-            ats_prompt = f"""
-            Evaluate the following cover letter against this job description.
+        # PDF Download
+        download_pdf_button(cover_letter)
 
-            Provide:
-            1. An ATS match score out of 100
-            2. A short explanation for the score
-            3. Three suggestions to improve the cover letter
+        # ATS Match Scoring
+        if job_description:
+            with st.spinner("🔍 Analyzing ATS match..."):
+                ats_prompt = f"""
+                Evaluate the following cover letter against this job description.
 
-            --- COVER LETTER ---
-            {cover_letter}
+                Provide:
+                1. An ATS match score out of 100
+                2. A short explanation for the score
+                3. Three suggestions to improve the cover letter
 
-            --- JOB DESCRIPTION ---
-            {job_description}
-            """
+                --- COVER LETTER ---
+                {cover_letter}
 
-            ats_response = model.generate_content(ats_prompt)
-            st.markdown("---")
-            st.subheader("📊 ATS Match Analysis")
-            st.markdown(ats_response.text)
+                --- JOB DESCRIPTION ---
+                {job_description}
+                """
+
+                ats_response = model.generate_content(ats_prompt)
+                st.markdown("---")
+                st.subheader("📊 ATS Match Analysis")
+                st.markdown(ats_response.text)
 
 st.markdown("<div class='footer'>Made with ❤️ • Powered by Gemini 1.5 Flash</div>", unsafe_allow_html=True)
