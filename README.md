@@ -4,11 +4,12 @@ PitchPerfectAI is a Streamlit-based web application that leverages Google's Gemi
 
 ## 🚀 Features
 
-- 🌟 AI-generated personalized cover letters
-- 🎯 ATS match analysis with scoring and improvement tips
-- 🎨 Clean UI with glowing text fields for enhanced interactivity
-- ✍️ Supports multiple tones (Professional, Persuasive, Friendly, etc.)
-- 🔒 API key managed securely using `.env`
+- 🎯 **Smart Prompting**: Generates professional cover letters using Gemini 1.5 Flash
+- 📝 **Custom Input**: Add your experience, skills, achievements, and job description
+- 📊 **ATS Match Analysis**: Get a score and tips to improve your match
+- 📥 **Download as PDF**: Save your letter instantly
+- 🌐 **Ready to Deploy**: Works locally or on Streamlit Cloud
+
 
 ## 📦 Tech Stack
 
