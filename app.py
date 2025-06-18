@@ -60,7 +60,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Title
 st.markdown("<h1 class='title'>✉️ PitchPerfectAI – AI Cover Letter Generator</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -139,5 +138,4 @@ if submitted:
             st.subheader("📊 ATS Match Analysis")
             st.markdown(ats_response.text)
 
-# Footer
 st.markdown("<div class='footer'>Made with ❤️ • Powered by Gemini 1.5 Flash</div>", unsafe_allow_html=True)
